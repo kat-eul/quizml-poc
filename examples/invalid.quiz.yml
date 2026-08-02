@@ -1,0 +1,24 @@
+quiz:
+  title: "Quiz de test invalide"
+  settings:
+    mode: individual
+
+questions:
+  - id: q1
+    type: choice
+    title: "Quels prénoms ont été envisagés ?"
+    options:
+      - text: "Emma"
+        correct: false
+      - text: "Louise"
+        correct: false
+
+  - id: q2
+    type: number
+    title: "Poids du bébé"
+    range:
+      min: 5000
+      max: 2000
+    answer:
+      value: 3500
+      tolerance: 200

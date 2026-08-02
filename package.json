@@ -1,0 +1,17 @@
+{
+  "name": "quiz-engine",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "npm test --workspaces --if-present",
+    "dev:server": "npm run dev --workspace=@quiz-engine/server",
+    "dev:host": "npm run dev --workspace=@quiz-engine/host-app",
+    "dev:player": "npm run dev --workspace=@quiz-engine/player-app",
+    "build:libs": "npm run build --workspace=@quiz-engine/core && npm run build --workspace=@quiz-engine/shared",
+    "build": "npm run build:libs && npm run build --workspace=@quiz-engine/host-app && npm run build --workspace=@quiz-engine/player-app && npm run build --workspace=@quiz-engine/server",
+    "start": "npm run start --workspace=@quiz-engine/server"
+  }
+}

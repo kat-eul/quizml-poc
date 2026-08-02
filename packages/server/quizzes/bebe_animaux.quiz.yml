@@ -1,0 +1,124 @@
+quiz:
+  title: "Les bébés animaux"
+  description: "Retrouve le nom des petits animaux."
+  theme: nature
+
+  settings:
+    max_players: 20
+    mode: individual
+    show_answers: automatic
+
+teams:
+  enabled: false
+
+questions:
+
+  - id: q1
+    type: image
+    title: "Quel est le nom de cet animal (enfant) ?"
+    time_limit: 5
+    points: 1
+    media:
+      type: image
+      source: "./images/agneau.jpg"
+    answer:
+      accepted: [ "agneau"]
+
+  - id: q2
+    type: image
+    title: "Comment appelle-t-on le petit de cet animal ?"
+    time_limit: 6
+    points: 1
+    media:
+      type: image
+      source: "./images/vache.jpg"
+    answer:
+      accepted: [ "veau"]
+
+  - id: q3
+    type: image
+    title: "Quel est le nom de cet animal (enfant) ?"
+    time_limit: 6
+    points: 1
+    media:
+      type: image
+      source: "./images/faon.jpg"
+    answer:
+      accepted: [ "faon"]
+
+  - id: q4
+    type: image
+    title: "Comment appelle-t-on le petit de cet animal ?"
+    time_limit: 5
+    points: 1
+    media:
+      type: image
+      source: "./images/chevre.jpg"
+    answer:
+      accepted: [ "chevreau"]
+
+  - id: q5
+    type: image
+    title: "Quel est le nom de cet animal (enfant) ?"
+    time_limit: 5
+    points: 1
+    media:
+      type: image
+      source: "./images/porcelet.jpg"
+    answer:
+      accepted: [ "porcelet"]
+
+  - id: q6
+    type: image
+    title: "Comment appelle-t-on le petit de cet animal ?"
+    time_limit: 7
+    points: 1
+    media:
+      type: image
+      source: "./images/canard.jpg"
+    answer:
+      accepted: [ "caneton"]
+
+  - id: q7
+    type: image
+    title: "Quel est le nom de cet animal (enfant) ?"
+    time_limit: 4
+    points: 1
+    media:
+      type: image
+      source: "./images/anon.jpg"
+    answer:
+      accepted: [ "anon,ânon"]
+
+  - id: q8
+    type: image
+    title: "Comment appelle-t-on le petit de cet animal ?"
+    time_limit: 7
+    points: 1
+    media:
+      type: image
+      source: "./images/cheval.jpg"
+    answer:
+      accepted: [ "poulain"]
+
+  - id: q9
+    type: image
+    title: "Quel est le nom de cet animal (enfant) ?"
+    time_limit: 8
+    points: 1
+    media:
+      type: image
+      source: "./images/marcassin.jpg"
+    answer:
+      accepted: [ "marcassin"]
+
+  - id: q10
+    type: image
+    title: "Comment appelle-t-on le petit de cet animal ?"
+    time_limit: 6
+    points: 1
+    media:
+      type: image
+      source: "./images/mouton.jpg"
+    answer:
+      accepted: [ "agneau"]

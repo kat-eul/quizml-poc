@@ -1,0 +1,140 @@
+/*
+  Mêmes tokens de couleur que host-app (dupliqués volontairement : deux apps
+  Vite indépendantes, pas de package de tokens partagé pour rester simple).
+  Contrainte du brief : "pas d'animations lourdes côté joueur" — les seules
+  transitions ici sont de courtes transitions d'état (0.1s), pas d'animation
+  d'entrée/de décor comme la guirlande de host-app.
+*/
+
+:root {
+  --color-ink: #2b2530;
+  --color-ink-soft: #5c5462;
+  --color-cream: #faf6f0;
+  --color-surface: #ffffff;
+  --color-border: rgba(43, 37, 48, 0.12);
+
+  --color-sage: #93a487;
+  --color-sage-soft: #e4e9df;
+  --color-apricot: #e2986b;
+  --color-apricot-soft: #f8e5d5;
+  --color-plum: #7d5d72;
+  --color-plum-soft: #ece1e8;
+  --color-gold: #c79a3a;
+  --color-gold-soft: #f3e6c4;
+  --color-error: #b3543f;
+  --color-error-soft: #f6e0da;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --radius-md: 14px;
+  --radius-lg: 22px;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  /* évite le zoom automatique iOS sur les inputs */
+  touch-action: manipulation;
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-ink);
+}
+
+input,
+button {
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+button {
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  transition: opacity 0.1s ease, background-color 0.1s ease;
+  min-height: 52px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+button:active:not(:disabled) {
+  opacity: 0.85;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--color-plum);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background: var(--color-ink);
+  color: var(--color-cream);
+  width: 100%;
+}
+
+.btn-option {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1.5px solid var(--color-border);
+  width: 100%;
+  text-align: left;
+  font-weight: 600;
+}
+
+.btn-option.selected {
+  background: var(--color-plum-soft);
+  border-color: var(--color-plum);
+}
+
+input[type='text'],
+input[type='number'] {
+  width: 100%;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+input:focus-visible {
+  outline: 3px solid var(--color-plum);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

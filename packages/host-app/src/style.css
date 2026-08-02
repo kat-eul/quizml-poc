@@ -1,0 +1,143 @@
+/*
+  Palette : fête discrète — sauge, abricot, prune poudrée, or mat sur fond
+  ivoire chaud. Volontairement loin du rose/bleu gender-reveal cliché, pour
+  rester pertinent sur tous les types d'événements (anniversaire, mariage,
+  team building...).
+
+  Signature : la "guirlande" (voir GarlandDivider.vue) — une suite de petits
+  cercles alternant les couleurs d'accent, comme une guirlande de fête
+  tendue au-dessus de chaque section. C'est le seul élément décoratif
+  récurrent ; tout le reste du dashboard reste sobre et fonctionnel.
+*/
+
+:root {
+  --color-ink: #2b2530;
+  --color-ink-soft: #5c5462;
+  --color-cream: #faf6f0;
+  --color-surface: #ffffff;
+  --color-border: rgba(43, 37, 48, 0.12);
+
+  --color-sage: #93a487;
+  --color-sage-soft: #e4e9df;
+  --color-apricot: #e2986b;
+  --color-apricot-soft: #f8e5d5;
+  --color-plum: #7d5d72;
+  --color-plum-soft: #ece1e8;
+  --color-gold: #c79a3a;
+  --color-gold-soft: #f3e6c4;
+  --color-error: #b3543f;
+  --color-error-soft: #f6e0da;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --shadow-card: 0 1px 2px rgba(43, 37, 48, 0.06), 0 8px 24px rgba(43, 37, 48, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-ink);
+}
+
+button {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 999px;
+  padding: 0.75rem 1.5rem;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+button:focus-visible {
+  outline: 3px solid var(--color-plum);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background: var(--color-ink);
+  color: var(--color-cream);
+}
+
+.btn-primary:not(:disabled):hover {
+  box-shadow: 0 6px 16px rgba(43, 37, 48, 0.25);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1.5px solid var(--color-border);
+}
+
+.btn-danger {
+  background: var(--color-error-soft);
+  color: var(--color-error);
+}
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 1.75rem;
+}
+
+.mono-chip {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: var(--color-ink);
+  color: var(--color-cream);
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
