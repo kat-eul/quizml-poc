@@ -14,7 +14,7 @@ export function normalizeText(value: string): string {
 
 /**
  * Distance de Levenshtein simple, utilisée uniquement pour la tolérance aux
- * fautes de frappe (fuzzy_matching: true) sur les questions de type text.
+ * fautes de frappe (fuzzy_matching: true) sur les réponses de type text.
  */
 function levenshteinDistance(a: string, b: string): number {
   const rows = a.length + 1;
@@ -27,11 +27,7 @@ function levenshteinDistance(a: string, b: string): number {
   for (let i = 1; i < rows; i++) {
     for (let j = 1; j < cols; j++) {
       const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      matrix[i][j] = Math.min(
-        matrix[i - 1][j] + 1, // suppression
-        matrix[i][j - 1] + 1, // insertion
-        matrix[i - 1][j - 1] + cost // substitution
-      );
+      matrix[i][j] = Math.min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1] + cost);
     }
   }
   return matrix[rows - 1][cols - 1];
@@ -39,8 +35,7 @@ function levenshteinDistance(a: string, b: string): number {
 
 /**
  * Tolérance aux fautes de frappe : 1 erreur autorisée jusqu'à 7 caractères,
- * 2 erreurs au-delà. Volontairement simple — l'objectif est de rattraper une
- * faute de frappe sur mobile, pas de faire du matching sémantique.
+ * 2 erreurs au-delà.
  */
 function fuzzyMatches(input: string, accepted: string): boolean {
   const normInput = normalizeText(input);
@@ -52,40 +47,35 @@ function fuzzyMatches(input: string, accepted: string): boolean {
 }
 
 /**
- * Résultat de correction pour les questions à correction automatique.
- * Retourne `null` pour les questions à correction manuelle (text en mode
- * manual) : c'est à l'animateur de juger, via GameEngine.validateManualAnswer().
+ * Corrige une réponse selon `question.answer.mode` — indépendant de la
+ * présence ou non d'un média sur la question. Retourne `null` pour signaler
+ * qu'une réponse texte en correction manuelle attend l'animateur.
  */
 export function evaluateAnswer(question: Question, value: unknown): boolean | null {
-  switch (question.type) {
+  const answer = question.answer;
+
+  switch (answer.mode) {
     case 'boolean':
-      return typeof value === 'boolean' && value === question.answer;
+      return typeof value === 'boolean' && value === answer.value;
 
     case 'choice': {
       const selected = Array.isArray(value) ? (value as string[]) : [];
-      const correctOptions = question.options.filter((o) => o.correct).map((o) => o.text);
+      const correctOptions = answer.options.filter((o) => o.correct).map((o) => o.text);
 
-      if (question.multiple) {
-        // Exact match d'ensemble : toutes les bonnes réponses cochées, aucune mauvaise
+      if (answer.multiple) {
         const selectedSet = new Set(selected);
         const correctSet = new Set(correctOptions);
         if (selectedSet.size !== correctSet.size) return false;
         return [...selectedSet].every((s) => correctSet.has(s));
       }
-      // Choix unique : une seule option sélectionnée, et c'est la bonne
       return selected.length === 1 && correctOptions.includes(selected[0]);
     }
 
-    case 'image': {
-      if (typeof value !== 'string') return false;
-      return question.answer.accepted.some((accepted) => normalizeText(value) === normalizeText(accepted));
-    }
-
     case 'text': {
-      if (question.validation.mode === 'manual') return null; // jugé par l'animateur
+      if (answer.correction === 'manual') return null; // jugé par l'animateur
       if (typeof value !== 'string') return false;
-      const accepted = question.validation.accepted ?? [];
-      if (question.validation.fuzzyMatching) {
+      const accepted = answer.accepted ?? [];
+      if (answer.fuzzyMatching) {
         return accepted.some((a) => fuzzyMatches(value, a));
       }
       return accepted.some((a) => normalizeText(value) === normalizeText(a));
@@ -93,29 +83,17 @@ export function evaluateAnswer(question: Question, value: unknown): boolean | nu
 
     case 'number': {
       if (typeof value !== 'number' || Number.isNaN(value)) return false;
-      return Math.abs(value - question.answer.value) <= question.answer.tolerance;
-    }
-
-    case 'music': {
-      if (question.answer.mode === 'choice') {
-        if (typeof value !== 'string') return false;
-        const correctOptions = (question.answer.options ?? []).filter((o) => o.correct).map((o) => o.text);
-        return correctOptions.includes(value);
-      }
-      // mode: text
-      if (typeof value !== 'string') return false;
-      const accepted = question.answer.accepted ?? [];
-      return accepted.some((a) => normalizeText(value) === normalizeText(a));
+      return Math.abs(value - answer.value) <= answer.tolerance;
     }
 
     default: {
-      const _exhaustive: never = question;
-      throw new Error(`Type de question non géré par evaluateAnswer: ${JSON.stringify(_exhaustive)}`);
+      const _exhaustive: never = answer;
+      throw new Error(`Format de réponse non géré par evaluateAnswer: ${JSON.stringify(_exhaustive)}`);
     }
   }
 }
 
 /** true si cette question nécessite une validation manuelle par l'animateur */
 export function requiresManualValidation(question: Question): boolean {
-  return question.type === 'text' && question.validation.mode === 'manual';
+  return question.answer.mode === 'text' && question.answer.correction === 'manual';
 }

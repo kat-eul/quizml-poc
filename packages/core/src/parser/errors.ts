@@ -25,8 +25,8 @@ export class QuizYamlSyntaxError extends Error {
 
 /**
  * Transforme les issues Zod en messages lisibles, du type :
- * "questions[2] (type: choice) — il faut au moins 2 options"
- * "quiz.title — le titre de la question est obligatoire"
+ * "question 'q2' (réponse: choice) : il faut au moins 2 options"
+ * "quiz.title : quiz.title est obligatoire"
  */
 export function formatZodError(error: ZodError, rawQuestions?: unknown[]): string[] {
   return error.issues.map((issue) => formatIssue(issue, rawQuestions));
@@ -38,13 +38,15 @@ function formatIssue(issue: ZodIssue, rawQuestions?: unknown[]): string {
   // Cas fréquent : erreur sur une question précise → questions[N]
   if (path[0] === 'questions' && typeof path[1] === 'number') {
     const index = path[1] as number;
-    const question = rawQuestions?.[index] as { id?: string; type?: string; title?: string } | undefined;
+    const question = rawQuestions?.[index] as
+      | { id?: string; title?: string; answer?: { mode?: string } }
+      | undefined;
     const label = question?.id
       ? `question '${question.id}'`
       : `question ${index + 1}`;
-    const typeInfo = question?.type ? ` (type: ${question.type})` : '';
+    const modeInfo = question?.answer?.mode ? ` (réponse: ${question.answer.mode})` : '';
     const titleInfo = question?.title ? ` — "${question.title}"` : '';
-    return `${label}${typeInfo}${titleInfo} : ${issue.message}`;
+    return `${label}${modeInfo}${titleInfo} : ${issue.message}`;
   }
 
   const pathStr = path.length > 0 ? path.join('.') : '(racine du fichier)';

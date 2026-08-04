@@ -1,0 +1,263 @@
+quiz:
+  title: "Les comptines de notre enfance"
+  description: "Blindtest et quiz sur les comptines françaises"
+  theme: pastel
+
+questions:
+  - title: "🎵 Blindtest : Quel est le titre de cette comptine ?"
+    points: 2
+    media:
+      type: youtube
+      url : "https://youtu.be/3VXKlKc7vJs"
+      clip:
+        start: 0
+        duration: 8
+    answer:
+      mode: text
+      correction: automatic
+      accepted:
+        - "Une souris verte"
+      fuzzy_matching: true
+
+  - title: "Complète les paroles : « Au clair de la lune, mon ami... »"
+    answer:
+      mode: choice
+      options:
+        - text: "Pierrot"
+          correct: true
+        - text: "Martin"
+        - text: "Nicolas"
+        - text: "Guillaume"
+
+  - title: "🎵 Blindtest : Quelle est cette comptine ?"
+    points: 2
+    media:
+      type: youtube
+      url : "https://youtu.be/3VXKlKc7vJs"
+      clip:
+        start: 0
+        duration: 8
+    answer:
+      mode: choice
+      options:
+        - text: "Frère Jacques"
+          correct: true
+        - text: "Au clair de la lune"
+        - text: "Meunier tu dors"
+        - text: "Ainsi font, font, font"
+
+  - title: "Quel est le titre de cette comptine ? « Promenons-nous dans les bois... »"
+    answer:
+      mode: text
+      correction: automatic
+      accepted:
+        - "Promenons-nous dans les bois"
+      fuzzy_matching: true
+
+  - title: "🎵 Blindtest : Quelle est cette comptine ?"
+    points: 2
+    media:
+      type: youtube
+      url : "https://youtu.be/3VXKlKc7vJs"
+      clip:
+        start: 0
+        duration: 8
+    answer:
+      mode: choice
+      options:
+        - text: "Pirouette Cacahuète"
+          correct: true
+        - text: "Pomme de reinette"
+        - text: "Alouette"
+        - text: "Le grand cerf"
+
+  - title: "Complète les paroles : « Une souris verte, qui courait dans... »"
+    answer:
+      mode: choice
+      options:
+        - text: "les prés"
+          correct: true
+        - text: "les bois"
+        - text: "la forêt"
+        - text: "la campagne"
+
+  - title: "🎵 Blindtest : Quelle est cette comptine ?"
+    points: 2
+    media:
+      type: youtube
+      url : "https://youtu.be/3VXKlKc7vJs"
+      clip:
+        start: 0
+        duration: 8
+    answer:
+      mode: text
+      correction: automatic
+      accepted:
+        - "Pomme de reinette"
+        - "Pomme de reinette et pomme d'api"
+      fuzzy_matching: true
+
+  - title: "Complète les paroles : « Meunier, tu dors, ton moulin va... »"
+    answer:
+      mode: choice
+      options:
+        - text: "trop vite"
+          correct: true
+        - text: "très bien"
+        - text: "beaucoup"
+        - text: "fort"
+
+  - title: "🎵 Blindtest : Quelle est cette comptine ?"
+    points: 2
+    media:
+      type: youtube
+      url : "https://youtu.be/3VXKlKc7vJs"
+      clip:
+        start: 0
+        duration: 8
+    answer:
+      mode: choice
+      options:
+        - text: "Dans sa maison un grand cerf"
+          correct: true
+        - text: "Alouette"
+        - text: "Ah les crocodiles"
+        - text: "Bateau sur l'eau"
+
+  - title: "Complète les paroles : « Ainsi font, font, font les petites... »"
+    answer:
+      mode: choice
+      options:
+        - text: "marionnettes"
+          correct: true
+        - text: "mains"
+        - text: "filles"
+        - text: "danseuses"
+
+  - title: "🎵 Blindtest : Quelle est cette comptine ?"
+    points: 2
+    media:
+      type: youtube
+      url : "https://youtu.be/3VXKlKc7vJs"
+      clip:
+        start: 0
+        duration: 8
+    answer:
+      mode: text
+      correction: automatic
+      accepted:
+        - "Au clair de la lune"
+      fuzzy_matching: true
+
+  - title: "Quelle est la suite ? « Dans sa maison un grand cerf regardait par la... »"
+    answer:
+      mode: choice
+      options:
+        - text: "fenêtre"
+          correct: true
+        - text: "porte"
+        - text: "lucarne"
+        - text: "cheminée"
+
+  - title: "🎵 Blindtest : Quelle est cette comptine ?"
+    points: 2
+    media:
+      type: youtube
+      url : "https://youtu.be/3VXKlKc7vJs"
+      clip:
+        start: 0
+        duration: 8
+    answer:
+      mode: choice
+      options:
+        - text: "Ah ! Les crocodiles"
+          correct: true
+        - text: "Alouette"
+        - text: "Savez-vous planter les choux ?"
+        - text: "Il était un petit navire"
+
+  - title: "Écris le titre de cette comptine : « Savez-vous planter les choux... »"
+    answer:
+      mode: text
+      correction: automatic
+      accepted:
+        - "Savez-vous planter les choux"
+      fuzzy_matching: true
+
+  - title: "🎵 Blindtest : Quelle est cette comptine ?"
+    points: 2
+    media:
+      type: youtube
+      url : "https://youtu.be/3VXKlKc7vJs"
+      clip:
+        start: 0
+        duration: 8
+    answer:
+      mode: text
+      correction: automatic
+      accepted:
+        - "Alouette"
+        - "Alouette gentille alouette"
+      fuzzy_matching: true
+
+  - title: "Complète les paroles : « Il était un petit navire, il était un petit... »"
+    answer:
+      mode: choice
+      options:
+        - text: "navire"
+          correct: true
+        - text: "bateau"
+        - text: "voilier"
+        - text: "marin"
+
+  - title: "🎵 Blindtest : Quelle est cette comptine ?"
+    points: 2
+    media:
+      type: youtube
+      url : "https://youtu.be/3VXKlKc7vJs"
+      clip:
+        start: 0
+        duration: 8
+    answer:
+      mode: choice
+      options:
+        - text: "Promenons-nous dans les bois"
+          correct: true
+        - text: "Le grand cerf"
+        - text: "Frère Jacques"
+        - text: "Une souris verte"
+
+  - title: "Complète les paroles : « Une poule sur un mur, qui picote du pain... »"
+    answer:
+      mode: choice
+      options:
+        - text: "dur"
+          correct: true
+        - text: "blanc"
+        - text: "gris"
+        - text: "frais"
+
+  - title: "🎵 Blindtest : Quelle est cette comptine ?"
+    points: 2
+    media:
+      type: youtube
+      url : "https://youtu.be/3VXKlKc7vJs"
+      clip:
+        start: 0
+        duration: 8
+    answer:
+      mode: text
+      correction: automatic
+      accepted:
+        - "Meunier tu dors"
+      fuzzy_matching: true
+
+  - title: "Complète les paroles : « Frère Jacques, Frère Jacques, dormez-vous ? Dormez-vous ?... »"
+    answer:
+      mode: choice
+      options:
+        - text: "Sonnez les matines"
+          correct: true
+        - text: "Réveillez-vous"
+        - text: "Levez-vous"
+        - text: "Bonjour monsieur"

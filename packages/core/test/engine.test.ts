@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import type { Quiz } from '../src/models/quiz';
-import { GameEngine, GameEngineError } from '../src/engine';
+import type { Quiz } from '../src/models/quiz.js';
+import { GameEngine, GameEngineError } from '../src/engine/index.js';
 
 function buildQuiz(overrides: Partial<Quiz> = {}): Quiz {
   return {
@@ -8,25 +8,26 @@ function buildQuiz(overrides: Partial<Quiz> = {}): Quiz {
     settings: { maxPlayers: 3, mode: 'individual', showAnswers: 'manual' },
     teamsEnabled: false,
     questions: [
-      { id: 'q1', title: 'Vrai ou faux ?', type: 'boolean', answer: true, points: 1 },
+      { id: 'q1', title: 'Vrai ou faux ?', points: 1, answer: { mode: 'boolean', value: true } },
       {
         id: 'q2',
         title: 'Choix multiple',
-        type: 'choice',
-        multiple: true,
         points: 2,
-        options: [
-          { text: 'Emma', correct: true },
-          { text: 'Louise', correct: true },
-          { text: 'Alice', correct: false },
-        ],
+        answer: {
+          mode: 'choice',
+          multiple: true,
+          options: [
+            { text: 'Emma', correct: true },
+            { text: 'Louise', correct: true },
+            { text: 'Alice', correct: false },
+          ],
+        },
       },
       {
         id: 'q3',
         title: 'Prénom (manuel)',
-        type: 'text',
         points: 3,
-        validation: { mode: 'manual' },
+        answer: { mode: 'text', correction: 'manual' },
       },
     ],
     ...overrides,
@@ -54,7 +55,7 @@ describe('GameEngine — cycle de vie et scoring de base', () => {
     expect(() => engine.addPlayer('Dave')).toThrow(GameEngineError);
   });
 
-  it('score correctement une question boolean', () => {
+  it('score correctement une réponse boolean', () => {
     engine.startGame();
     const result = engine.submitAnswer(alice.id, true);
     expect(result.isCorrect).toBe(true);
@@ -74,7 +75,6 @@ describe('GameEngine — cycle de vie et scoring de base', () => {
     engine.lockCurrentQuestion();
     expect(engine.getSnapshot().state).toBe('question_locked');
 
-    // plus de réponses acceptées une fois verrouillée
     const bob = engine.addPlayer('Bob');
     expect(engine.submitAnswer(bob.id, true).accepted).toBe(false);
 
@@ -96,10 +96,17 @@ describe('GameEngine — cycle de vie et scoring de base', () => {
     engine.nextQuestion();
     expect(engine.getSnapshot().state).toBe('finished');
   });
+
+  it('expose les métadonnées du quiz dans le snapshot', () => {
+    const snapshot = engine.getSnapshot();
+    expect(snapshot.quizTitle).toBe('Quiz de test');
+    expect(snapshot.totalQuestions).toBe(3);
+    expect(snapshot.teamsEnabled).toBe(false);
+  });
 });
 
 describe('GameEngine — choix multiple', () => {
-  it('valide uniquement si l\'ensemble sélectionné correspond exactement aux bonnes réponses', () => {
+  it("valide uniquement si l'ensemble sélectionné correspond exactement aux bonnes réponses", () => {
     const engine = new GameEngine(buildQuiz());
     const alice = engine.addPlayer('Alice');
     engine.startGame();
@@ -136,7 +143,7 @@ describe('GameEngine — validation manuelle (text)', () => {
     engine.nextQuestion(); // q3 (text manuel)
   }
 
-  it('n\'attribue aucun point tant que l\'animateur n\'a pas validé', () => {
+  it("n'attribue aucun point tant que l'animateur n'a pas validé", () => {
     const engine = new GameEngine(buildQuiz());
     const alice = engine.addPlayer('Alice');
     toQuestion3(engine);
@@ -146,7 +153,7 @@ describe('GameEngine — validation manuelle (text)', () => {
     expect(engine.getLeaderboard()[0].score).toBe(0);
   });
 
-  it('empêche de passer à la suite tant qu\'une réponse manuelle est en attente', () => {
+  it("empêche de passer à la suite tant qu'une réponse manuelle est en attente", () => {
     const engine = new GameEngine(buildQuiz());
     const alice = engine.addPlayer('Alice');
     toQuestion3(engine);
@@ -157,7 +164,7 @@ describe('GameEngine — validation manuelle (text)', () => {
     expect(() => engine.nextQuestion()).toThrow(GameEngineError);
   });
 
-  it('valide individuellement chaque joueur et ajuste le score si l\'animateur change d\'avis', () => {
+  it("valide individuellement chaque joueur et ajuste le score si l'animateur change d'avis", () => {
     const engine = new GameEngine(buildQuiz());
     const alice = engine.addPlayer('Alice');
     toQuestion3(engine);
@@ -168,7 +175,6 @@ describe('GameEngine — validation manuelle (text)', () => {
     engine.validateManualAnswer(alice.id, true);
     expect(engine.getLeaderboard()[0].score).toBe(3);
 
-    // l'animateur se ravise
     engine.validateManualAnswer(alice.id, false);
     expect(engine.getLeaderboard()[0].score).toBe(0);
   });
@@ -179,9 +185,9 @@ describe('GameEngine — joueur qui rejoint en retard', () => {
     const engine = new GameEngine(buildQuiz());
     const alice = engine.addPlayer('Alice');
     engine.startGame();
-    engine.submitAnswer(alice.id, true); // Alice score 1 point
+    engine.submitAnswer(alice.id, true);
 
-    const bob = engine.addPlayer('Bob'); // rejoint après le début de la partie
+    const bob = engine.addPlayer('Bob');
     expect(bob.score).toBe(0);
     expect(engine.getSnapshot().players).toHaveLength(2);
   });
@@ -196,5 +202,34 @@ describe('GameEngine — équipes', () => {
     engine.submitAnswer(alice.id, true);
 
     expect(engine.getTeamLeaderboard()[0].score).toBe(1);
+  });
+});
+
+describe('GameEngine — découplage média/réponse', () => {
+  it("accepte une question avec un média image et une réponse de type choice", () => {
+    const quiz = buildQuiz({
+      questions: [
+        {
+          id: 'q1',
+          title: 'Qui est ce bébé ?',
+          points: 2,
+          media: { type: 'image', source: './images/bebe.jpg' },
+          answer: {
+            mode: 'choice',
+            multiple: false,
+            options: [
+              { text: 'Papa', correct: true },
+              { text: 'Maman', correct: false },
+            ],
+          },
+        },
+      ],
+    });
+    const engine = new GameEngine(quiz);
+    const alice = engine.addPlayer('Alice');
+    engine.startGame();
+
+    const result = engine.submitAnswer(alice.id, ['Papa']);
+    expect(result.isCorrect).toBe(true);
   });
 });

@@ -1,11 +1,19 @@
 /**
  * Modèle de données interne du moteur de quiz.
- * Ces types représentent un quiz APRÈS parsing, validation et normalisation
- * du fichier .quiz.yml — jamais avant. Le reste de l'application (moteur de
- * jeu, serveur, UI) ne doit connaître QUE ces types, jamais la forme brute du YAML.
+ *
+ * IMPORTANT — architecture découplée : une question n'a plus de "type"
+ * unique qui fige à la fois ce qui est présenté ET comment on y répond.
+ * Deux notions indépendantes :
+ *   - `media` (optionnel) : CE QUI EST MONTRÉ AU JOUEUR — image, audio, ou
+ *     vidéo YouTube. N'importe quelle question peut en avoir un, ou aucun.
+ *   - `answer` : LE FORMAT DE RÉPONSE ATTENDU — boolean, choice, text, ou
+ *     number. Indépendant de la présence ou non d'un média.
+ *
+ * Exemple : une question peut être "media: image" + "answer: choice"
+ * (deviner qui est sur la photo parmi des options), ou "media: youtube" +
+ * "answer: text" (blindtest en réponse libre), etc. — toutes les
+ * combinaisons sont valides.
  */
-
-export type QuestionType = 'boolean' | 'choice' | 'image' | 'text' | 'number' | 'music';
 
 export type GameMode = 'individual' | 'team';
 export type AnswerRevealMode = 'manual' | 'automatic';
@@ -25,92 +33,64 @@ export interface Quiz {
   questions: Question[];
 }
 
-export interface BaseQuestion {
-  id: string;
-  title: string;
-  points: number;
+// --- Média (optionnel, attachable à n'importe quelle question) ---
+
+export type MediaKind = 'image' | 'audio' | 'youtube';
+
+export interface MediaRef {
+  type: MediaKind;
+  /** chemin relatif à packages/server/quizzes/, requis pour type: image | audio */
+  source?: string;
+  /** requis pour type: youtube */
+  url?: string;
+  /** informatif — indique où couper l'extrait, en secondes */
+  clip?: { start: number; duration: number };
 }
+
+// --- Format de réponse (un des 4 modes, indépendant du média) ---
 
 export interface ChoiceOption {
   text: string;
   correct: boolean;
 }
 
-export interface MediaImageRef {
-  type: 'image';
-  source: string;
+export interface BooleanAnswer {
+  mode: 'boolean';
+  value: boolean;
 }
 
-export interface TextValidation {
-  mode: 'automatic' | 'manual';
-  accepted?: string[];
-  fuzzyMatching?: boolean;
-}
-
-export interface MusicClip {
-  start: number;
-  duration: number;
-}
-
-export interface MusicMedia {
-  type: 'youtube' | 'audio';
-  url?: string;
-  source?: string;
-  clip?: MusicClip;
-}
-
-export interface MusicAnswer {
-  mode: 'choice' | 'text';
-  options?: ChoiceOption[];
-  accepted?: string[];
-}
-
-export interface BooleanQuestion extends BaseQuestion {
-  type: 'boolean';
-  answer: boolean;
-}
-
-export interface ChoiceQuestion extends BaseQuestion {
-  type: 'choice';
+export interface ChoiceAnswer {
+  mode: 'choice';
   multiple: boolean;
   options: ChoiceOption[];
 }
 
-export interface ImageQuestion extends BaseQuestion {
-  type: 'image';
-  media: MediaImageRef;
-  answer: { accepted: string[] };
+export interface TextAnswer {
+  mode: 'text';
+  /** automatic = corrigé par le moteur (accepted/fuzzy_matching) ; manual = jugé par l'animateur */
+  correction: 'automatic' | 'manual';
+  accepted?: string[];
+  fuzzyMatching?: boolean;
 }
 
-export interface TextQuestion extends BaseQuestion {
-  type: 'text';
-  validation: TextValidation;
-}
-
-export interface NumberQuestion extends BaseQuestion {
-  type: 'number';
+export interface NumberAnswer {
+  mode: 'number';
   range: { min: number; max: number };
-  answer: { value: number; tolerance: number };
+  value: number;
+  tolerance: number;
 }
 
-export interface MusicQuestion extends BaseQuestion {
-  type: 'music';
-  media: MusicMedia;
-  answer: MusicAnswer;
-}
+export type AnswerSpec = BooleanAnswer | ChoiceAnswer | TextAnswer | NumberAnswer;
 
-/**
- * Union discriminée sur `type`. Permet un `switch (question.type)` exhaustif
- * partout dans le code (moteur de jeu, composants Vue), avec vérification
- * TypeScript si un cas est oublié.
- */
-export type Question =
-  | BooleanQuestion
-  | ChoiceQuestion
-  | ImageQuestion
-  | TextQuestion
-  | NumberQuestion
-  | MusicQuestion;
+// --- Question ---
+
+export interface Question {
+  id: string;
+  title: string;
+  points: number;
+  media?: MediaRef;
+  answer: AnswerSpec;
+}
 
 // --- Joueurs, équipes, réponses (utilisés par le moteur de jeu, pas par le parser) ---
 

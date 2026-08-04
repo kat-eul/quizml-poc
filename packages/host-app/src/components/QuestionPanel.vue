@@ -20,7 +20,9 @@ const emit = defineEmits<{
 
 const answeredCount = computed(() => props.answers.length);
 const correctCount = computed(() => props.answers.filter((a) => a.isCorrect === true).length);
-const isManualQuestion = computed(() => props.question.type === 'text' && props.question.validation.mode === 'manual');
+const isManualQuestion = computed(
+  () => props.question.answer.mode === 'text' && props.question.answer.correction === 'manual'
+);
 
 function nickname(playerId: string): string {
   return props.players.find((p) => p.id === playerId)?.nickname ?? '—';
@@ -32,23 +34,22 @@ function formatValue(value: unknown): string {
   return String(value);
 }
 
+function resolveMediaUrl(source: string): string {
+  if (/^https?:\/\//.test(source)) return source;
+  return `/quiz-media/${source.replace(/^\.?\//, '')}`;
+}
+
 const correctAnswerLabel = computed(() => {
-  const q = props.question;
-  switch (q.type) {
+  const answer = props.question.answer;
+  switch (answer.mode) {
     case 'boolean':
-      return q.answer ? 'Vrai' : 'Faux';
+      return answer.value ? 'Vrai' : 'Faux';
     case 'choice':
-      return q.options.filter((o) => o.correct).map((o) => o.text).join(', ');
-    case 'image':
-      return q.answer.accepted.join(' / ');
+      return answer.options.filter((o) => o.correct).map((o) => o.text).join(', ');
     case 'text':
-      return q.validation.mode === 'manual' ? 'Validation manuelle' : (q.validation.accepted ?? []).join(' / ');
+      return answer.correction === 'manual' ? 'Validation manuelle' : (answer.accepted ?? []).join(' / ');
     case 'number':
-      return `${q.answer.value} (± ${q.answer.tolerance})`;
-    case 'music':
-      return q.answer.mode === 'choice'
-        ? (q.answer.options ?? []).filter((o) => o.correct).map((o) => o.text).join(', ')
-        : (q.answer.accepted ?? []).join(' / ');
+      return `${answer.value} (± ${answer.tolerance})`;
     default:
       return '';
   }
@@ -57,8 +58,18 @@ const correctAnswerLabel = computed(() => {
 
 <template>
   <section class="card question-panel">
+    <!-- Aperçu du média pour l'animateur (image seulement pour l'instant —
+         l'audio/YouTube reste à lancer manuellement par l'animateur). -->
+    <img
+      v-if="question.media?.type === 'image' && question.media.source"
+      :src="resolveMediaUrl(question.media.source)"
+      alt=""
+      class="media-preview"
+    />
+
     <div class="meta">
-      <span class="type-tag">{{ question.type }}</span>
+      <span class="type-tag">{{ question.answer.mode }}</span>
+      <span v-if="question.media" class="media-tag">{{ question.media.type }}</span>
       <span class="points">{{ question.points }} pt{{ question.points > 1 ? 's' : '' }}</span>
     </div>
 
@@ -139,6 +150,26 @@ const correctAnswerLabel = computed(() => {
   background: var(--color-plum-soft);
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
+}
+
+.media-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-ink-soft);
+  background: var(--color-sage-soft);
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+}
+
+.media-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 180px;
+  margin: 0 auto;
+  border-radius: var(--radius-md);
+  object-fit: contain;
 }
 
 .points {

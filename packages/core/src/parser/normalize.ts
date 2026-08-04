@@ -1,14 +1,10 @@
-import type { QuizFileInput, QuestionInput } from './schema.js';
-import type { Quiz, Question } from '../models/quiz.js';
+import type { QuizFileInput, QuestionInput, AnswerInput } from './schema.js';
+import type { Quiz, Question, AnswerSpec, MediaRef } from '../models/quiz.js';
 
 /**
- * Transforme la sortie validée par Zod (encore proche de la forme YAML,
- * snake_case, ids optionnels) en modèle interne (camelCase, ids garantis,
- * valeurs par défaut déjà appliquées par Zod).
- *
- * C'est la SEULE fonction du projet qui a le droit de générer un id de
- * question à partir de son index — partout ailleurs, un id de question
- * doit déjà exister.
+ * Transforme la sortie validée par Zod (snake_case, ids optionnels) en
+ * modèle interne (camelCase, ids garantis). Seule fonction du projet
+ * autorisée à générer un id de question à partir de son index.
  */
 export function normalizeQuiz(input: QuizFileInput): Quiz {
   return {
@@ -30,41 +26,37 @@ function generateId(index: number): string {
 }
 
 function normalizeQuestion(q: QuestionInput, index: number): Question {
-  const id = q.id ?? generateId(index);
-  const base = { id, title: q.title, points: q.points };
+  return {
+    id: q.id ?? generateId(index),
+    title: q.title,
+    points: q.points,
+    media: q.media as MediaRef | undefined, // même forme, pas de transformation nécessaire
+    answer: normalizeAnswer(q.answer),
+  };
+}
 
-  switch (q.type) {
+function normalizeAnswer(a: AnswerInput): AnswerSpec {
+  switch (a.mode) {
     case 'boolean':
-      return { ...base, type: 'boolean', answer: q.answer };
+      return { mode: 'boolean', value: a.value };
 
     case 'choice':
-      return { ...base, type: 'choice', multiple: q.multiple, options: q.options };
-
-    case 'image':
-      return { ...base, type: 'image', media: q.media, answer: q.answer };
+      return { mode: 'choice', multiple: a.multiple, options: a.options };
 
     case 'text':
       return {
-        ...base,
-        type: 'text',
-        validation: {
-          mode: q.validation.mode,
-          accepted: q.validation.accepted,
-          fuzzyMatching: q.validation.fuzzy_matching,
-        },
+        mode: 'text',
+        correction: a.correction,
+        accepted: a.accepted,
+        fuzzyMatching: a.fuzzy_matching,
       };
 
     case 'number':
-      return { ...base, type: 'number', range: q.range, answer: q.answer };
-
-    case 'music':
-      return { ...base, type: 'music', media: q.media, answer: q.answer };
+      return { mode: 'number', range: a.range, value: a.value, tolerance: a.tolerance };
 
     default: {
-      // Exhaustivité : si un type de question est ajouté au schéma sans être
-      // géré ici, TypeScript refusera de compiler cette ligne.
-      const _exhaustive: never = q;
-      throw new Error(`Type de question non géré par le normalizer: ${JSON.stringify(_exhaustive)}`);
+      const _exhaustive: never = a;
+      throw new Error(`Format de réponse non géré par le normalizer: ${JSON.stringify(_exhaustive)}`);
     }
   }
 }
